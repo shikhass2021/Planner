@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UPSC 2026 - June 2025 Checklist Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f7fc;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .planner-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      padding: 20px;
+    }
+    .day-card {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    }
+    .day-card h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    .checklist li {
+      margin: 8px 0;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 10px;
+    }
+    .todo-section {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    textarea, input, button {
+      width: 100%;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    textarea {
+      padding: 10px;
+      height: 100px;
+      resize: vertical;
+    }
+    button {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .custom-note {
+      background-color: #e9f7ef;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📅 UPSC 2026 - June 2025 Planner with Checklist</h1>
+<h2>✔️ Mark Completed Tasks + Add Your Own</h2>
+
+<div class="planner-container" id="planner"></div>
+
+<div class="todo-section">
+  <h2>📝 Add Your Own Task</h2>
+  <input id="custom-date" type="date" />
+  <textarea id="custom-text" placeholder="Write your task or reminder here..."></textarea>
+  <button onclick="addCustomNote()">Add My Task</button>
+  <div id="custom-tasks"></div>
+</div>
+
+<script>
+  const studyPlan = [
+    ["📘 Polity (NCERT + Std Book)", "📗 Economy (MCQs + Notes)"],
+    ["📘 Economy (NCERT + Std Book)", "📗 Modern History (MCQs + Notes)"],
+    ["📘 Geography (NCERT + Std Book)", "📗 Polity (MCQs + Notes)"],
+    ["📘 Environment (ShankarIAS + NCERT)", "📗 Polity PYQs + Revision"],
+    ["📘 Science & Tech (NCERT + CA)", "📗 History PYQs + Mock Review"]
+  ];
+
+  const planner = document.getElementById("planner");
+
+  for (let i = 1; i <= 30; i++) {
+    const date = new Date(2025, 5, i); // June = month 5
+    const weekday = date.getDay();
+    const weekNumber = Math.floor((i - 1) / 7);
+    const dateKey = `day-${i}`;
+    let tasks = weekday === 0
+      ? ["🧠 Weekly Revision", "📑 Solve PYQs", "📝 Take Mock Test"]
+      : studyPlan[weekNumber % studyPlan.length];
+
+    const card = document.createElement("div");
+    card.className = "day-card";
+    card.innerHTML = `<h3>📅 June ${i}, 2025</h3><ul class="checklist" id="${dateKey}"></ul>`;
+    planner.appendChild(card);
+
+    const checklist = document.getElementById(dateKey);
+    tasks.forEach((task, index) => {
+      const taskId = `${dateKey}-task-${index}`;
+      const isChecked = localStorage.getItem(taskId) === "true";
+      const li = document.createElement("li");
+      li.innerHTML = `<label><input type="checkbox" id="${taskId}" ${isChecked ? "checked" : ""}/> ${task}</label>`;
+      checklist.appendChild(li);
+
+      // Save status on change
+      document.getElementById(taskId).addEventListener("change", (e) => {
+        localStorage.setItem(taskId, e.target.checked);
+      });
+    });
+  }
+
+  function addCustomNote() {
+    const date = document.getElementById("custom-date").value;
+    const text = document.getElementById("custom-text").value.trim();
+    if (!date || !text) {
+      alert("Please enter a date and a task.");
+      return;
+    }
+
+    const taskId = `custom-${date}-${Date.now()}`;
+    const taskDiv = document.createElement("div");
+    taskDiv.className = "custom-note";
+    taskDiv.innerHTML = `<label><input type="checkbox" id="${taskId}"/> <strong>${date}</strong>: ${text}</label>`;
+    document.getElementById("custom-tasks").appendChild(taskDiv);
+
+    // Save status
+    document.getElementById(taskId).addEventListener("change", (e) => {
+      localStorage.setItem(taskId, e.target.checked);
+    });
+
+    // Save to localStorage
+    let saved = JSON.parse(localStorage.getItem("my_upsc_notes") || "[]");
+    saved.push({ date, text, taskId });
+    localStorage.setItem("my_upsc_notes", JSON.stringify(saved));
+
+    // Clear inputs
+    document.getElementById("custom-date").value = "";
+    document.getElementById("custom-text").value = "";
+  }
+
+  function loadSavedNotes() {
+    const saved = JSON.parse(localStorage.getItem("my_upsc_notes") || "[]");
+    const container = document.getElementById("custom-tasks");
+    saved.forEach(note => {
+      const taskDiv = document.createElement("div");
+      taskDiv.className = "custom-note";
+      const isChecked = localStorage.getItem(note.taskId) === "true";
+      taskDiv.innerHTML = `<label><input type="checkbox" id="${note.taskId}" ${isChecked ? "checked" : ""}/> <strong>${note.date}</strong>: ${note.text}</label>`;
+      container.appendChild(taskDiv);
+      document.getElementById(note.taskId).addEventListener("change", (e) => {
+        localStorage.setItem(note.taskId, e.target.checked);
+      });
+    });
+  }
+
+  loadSavedNotes();
+</script>
+
+</body>
+</html>
