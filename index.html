@@ -2,183 +2,286 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>UPSC 2026 - June 2025 Checklist Planner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UPSC 2026 Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f7fc;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fce3ec, #f9f9ff);
       margin: 0;
-      padding: 20px;
+      padding: 30px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    h1, h2 {
+
+    h1 {
+      color: #5c5470;
+      font-size: 2em;
+      margin-bottom: 30px;
       text-align: center;
-      color: #333;
     }
-    .planner-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      padding: 20px;
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
     }
-    .day-card {
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+
+    .box {
+      background: #fff4f9;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      transition: 0.3s;
     }
-    .day-card h3 {
+
+    .box:hover {
+      transform: translateY(-3px);
+      box-shadow: 6px 10px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .box h2 {
+      color: #d36ba6;
       margin-top: 0;
-      font-size: 18px;
+      font-size: 1.5em;
     }
-    .checklist {
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background-color: #fff;
+    }
+
+    ul {
       list-style: none;
       padding-left: 0;
     }
-    .checklist li {
-      margin: 8px 0;
+
+    li {
+      background-color: #ffeef8;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      color: #5c5c5c;
     }
-    input[type="checkbox"] {
-      transform: scale(1.2);
-      margin-right: 10px;
-    }
-    .todo-section {
-      margin-top: 40px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    textarea, input, button {
-      width: 100%;
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    textarea {
-      padding: 10px;
-      height: 100px;
-      resize: vertical;
-    }
+
     button {
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
       border: none;
-      border-radius: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
       cursor: pointer;
-      margin-top: 10px;
+      transition: background-color 0.2s;
+      margin-left: 5px;
     }
-    button:hover {
-      background-color: #0056b3;
+
+    button.edit {
+      background-color: #ffe066;
     }
-    .custom-note {
-      background-color: #e9f7ef;
-      margin-top: 15px;
+
+    button.delete {
+      background-color: #ff6b6b;
+      color: white;
+    }
+
+    .study-log-entry {
+      background: #e1f7f2;
+      border-left: 6px solid #70d6ff;
+      border-radius: 12px;
       padding: 10px;
-      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
     }
   </style>
 </head>
 <body>
 
-<h1>📅 UPSC 2026 - June 2025 Planner with Checklist</h1>
-<h2>✔️ Mark Completed Tasks + Add Your Own</h2>
+  <h1>🌸 UPSC 2026 Planner</h1>
 
-<div class="planner-container" id="planner"></div>
+  <div class="container">
+    <!-- TO DO Box -->
+    <div class="box">
+      <h2>📝 Task List</h2>
+      <input type="text" id="taskInput" placeholder="Add a task..." />
+      <ul id="taskList"></ul>
+    </div>
 
-<div class="todo-section">
-  <h2>📝 Add Your Own Task</h2>
-  <input id="custom-date" type="date" />
-  <textarea id="custom-text" placeholder="Write your task or reminder here..."></textarea>
-  <button onclick="addCustomNote()">Add My Task</button>
-  <div id="custom-tasks"></div>
-</div>
+    <!-- Timetable Box -->
+    <div class="box">
+      <h2>📚 Timetable Subjects</h2>
+      <input type="text" id="subjectInput" placeholder="Add a subject..." />
+      <ul id="subjectList"></ul>
+    </div>
 
-<script>
-  const studyPlan = [
-    ["📘 Polity (NCERT + Std Book)", "📗 Economy (MCQs + Notes)"],
-    ["📘 Economy (NCERT + Std Book)", "📗 Modern History (MCQs + Notes)"],
-    ["📘 Geography (NCERT + Std Book)", "📗 Polity (MCQs + Notes)"],
-    ["📘 Environment (ShankarIAS + NCERT)", "📗 Polity PYQs + Revision"],
-    ["📘 Science & Tech (NCERT + CA)", "📗 History PYQs + Mock Review"]
-  ];
+    <!-- Study Log Box -->
+    <div class="box">
+      <h2>📆 Daily Study Log</h2>
+      <input type="date" id="logDate" />
+      <textarea id="logText" placeholder="What did you study today?"></textarea>
+      <button onclick="addStudyLog()">Add Log</button>
+      <div id="logContainer"></div>
+    </div>
+  </div>
 
-  const planner = document.getElementById("planner");
+  <script>
+    // TASKS
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
 
-  for (let i = 1; i <= 30; i++) {
-    const date = new Date(2025, 5, i); // June = month 5
-    const weekday = date.getDay();
-    const weekNumber = Math.floor((i - 1) / 7);
-    const dateKey = `day-${i}`;
-    let tasks = weekday === 0
-      ? ["🧠 Weekly Revision", "📑 Solve PYQs", "📝 Take Mock Test"]
-      : studyPlan[weekNumber % studyPlan.length];
+    function renderTasks() {
+      taskList.innerHTML = "";
+      const tasks = JSON.parse(localStorage.getItem("upsc_tasks") || "[]");
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        const span = document.createElement("span");
+        span.textContent = task;
 
-    const card = document.createElement("div");
-    card.className = "day-card";
-    card.innerHTML = `<h3>📅 June ${i}, 2025</h3><ul class="checklist" id="${dateKey}"></ul>`;
-    planner.appendChild(card);
+        const editBtn = document.createElement("button");
+        editBtn.className = "edit";
+        editBtn.textContent = "✏️";
+        editBtn.onclick = () => {
+          const updated = prompt("Edit task:", task);
+          if (updated) {
+            tasks[index] = updated;
+            localStorage.setItem("upsc_tasks", JSON.stringify(tasks));
+            renderTasks();
+          }
+        };
 
-    const checklist = document.getElementById(dateKey);
-    tasks.forEach((task, index) => {
-      const taskId = `${dateKey}-task-${index}`;
-      const isChecked = localStorage.getItem(taskId) === "true";
-      const li = document.createElement("li");
-      li.innerHTML = `<label><input type="checkbox" id="${taskId}" ${isChecked ? "checked" : ""}/> ${task}</label>`;
-      checklist.appendChild(li);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete";
+        deleteBtn.textContent = "🗑️";
+        deleteBtn.onclick = () => {
+          tasks.splice(index, 1);
+          localStorage.setItem("upsc_tasks", JSON.stringify(tasks));
+          renderTasks();
+        };
 
-      // Save status on change
-      document.getElementById(taskId).addEventListener("change", (e) => {
-        localStorage.setItem(taskId, e.target.checked);
+        li.appendChild(span);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
       });
-    });
-  }
-
-  function addCustomNote() {
-    const date = document.getElementById("custom-date").value;
-    const text = document.getElementById("custom-text").value.trim();
-    if (!date || !text) {
-      alert("Please enter a date and a task.");
-      return;
     }
 
-    const taskId = `custom-${date}-${Date.now()}`;
-    const taskDiv = document.createElement("div");
-    taskDiv.className = "custom-note";
-    taskDiv.innerHTML = `<label><input type="checkbox" id="${taskId}"/> <strong>${date}</strong>: ${text}</label>`;
-    document.getElementById("custom-tasks").appendChild(taskDiv);
-
-    // Save status
-    document.getElementById(taskId).addEventListener("change", (e) => {
-      localStorage.setItem(taskId, e.target.checked);
+    taskInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const value = taskInput.value.trim();
+        if (value) {
+          const tasks = JSON.parse(localStorage.getItem("upsc_tasks") || "[]");
+          tasks.push(value);
+          localStorage.setItem("upsc_tasks", JSON.stringify(tasks));
+          taskInput.value = "";
+          renderTasks();
+        }
+      }
     });
 
-    // Save to localStorage
-    let saved = JSON.parse(localStorage.getItem("my_upsc_notes") || "[]");
-    saved.push({ date, text, taskId });
-    localStorage.setItem("my_upsc_notes", JSON.stringify(saved));
+    // SUBJECTS
+    const subjectInput = document.getElementById("subjectInput");
+    const subjectList = document.getElementById("subjectList");
 
-    // Clear inputs
-    document.getElementById("custom-date").value = "";
-    document.getElementById("custom-text").value = "";
-  }
+    function renderSubjects() {
+      subjectList.innerHTML = "";
+      const subjects = JSON.parse(localStorage.getItem("upsc_subjects") || "[]");
+      subjects.forEach((subject, index) => {
+        const li = document.createElement("li");
+        const span = document.createElement("span");
+        span.textContent = subject;
 
-  function loadSavedNotes() {
-    const saved = JSON.parse(localStorage.getItem("my_upsc_notes") || "[]");
-    const container = document.getElementById("custom-tasks");
-    saved.forEach(note => {
-      const taskDiv = document.createElement("div");
-      taskDiv.className = "custom-note";
-      const isChecked = localStorage.getItem(note.taskId) === "true";
-      taskDiv.innerHTML = `<label><input type="checkbox" id="${note.taskId}" ${isChecked ? "checked" : ""}/> <strong>${note.date}</strong>: ${note.text}</label>`;
-      container.appendChild(taskDiv);
-      document.getElementById(note.taskId).addEventListener("change", (e) => {
-        localStorage.setItem(note.taskId, e.target.checked);
+        const editBtn = document.createElement("button");
+        editBtn.className = "edit";
+        editBtn.textContent = "✏️";
+        editBtn.onclick = () => {
+          const updated = prompt("Edit subject:", subject);
+          if (updated) {
+            subjects[index] = updated;
+            localStorage.setItem("upsc_subjects", JSON.stringify(subjects));
+            renderSubjects();
+          }
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete";
+        deleteBtn.textContent = "🗑️";
+        deleteBtn.onclick = () => {
+          subjects.splice(index, 1);
+          localStorage.setItem("upsc_subjects", JSON.stringify(subjects));
+          renderSubjects();
+        };
+
+        li.appendChild(span);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        subjectList.appendChild(li);
       });
+    }
+
+    subjectInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const value = subjectInput.value.trim();
+        if (value) {
+          const subjects = JSON.parse(localStorage.getItem("upsc_subjects") || "[]");
+          subjects.push(value);
+          localStorage.setItem("upsc_subjects", JSON.stringify(subjects));
+          subjectInput.value = "";
+          renderSubjects();
+        }
+      }
     });
-  }
 
-  loadSavedNotes();
-</script>
+    // STUDY LOG
+    const logDate = document.getElementById("logDate");
+    const logText = document.getElementById("logText");
+    const logContainer = document.getElementById("logContainer");
 
+    function addStudyLog() {
+      const date = logDate.value;
+      const text = logText.value.trim();
+      if (!date || !text) return alert("Please enter both date and log!");
+
+      const logs = JSON.parse(localStorage.getItem("study_logs") || "[]");
+      logs.push({ date, text });
+      localStorage.setItem("study_logs", JSON.stringify(logs));
+      logDate.value = "";
+      logText.value = "";
+      renderLogs();
+    }
+
+    function renderLogs() {
+      logContainer.innerHTML = "";
+      const logs = JSON.parse(localStorage.getItem("study_logs") || "[]");
+      logs.forEach((log, index) => {
+        const div = document.createElement("div");
+        div.className = "study-log-entry";
+        div.innerHTML = `<strong>${log.date}</strong><br>${log.text}`;
+        logContainer.appendChild(div);
+      });
+    }
+
+    // Initial renders
+    renderTasks();
+    renderSubjects();
+    renderLogs();
+  </script>
 </body>
 </html>
